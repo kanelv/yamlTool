@@ -1,0 +1,31 @@
+{
+  "name": "yamltool",
+  "version": "1.0.0",
+  "description": "for generating and managing yaml file",
+  "main": "yamlTool.js",
+  "scripts": {
+    "test": "node yamlTool.js",
+    "start": "node yamlTool.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/andalab/yamltool.git"
+  },
+  "keywords": [
+    "k8s",
+    "yaml"
+  ],
+  "author": "Cuong Le",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/andalab/yamltool/issues"
+  },
+  "homepage": "https://gitlab.com/andalab/yamltool#readme",
+  "dependencies": {
+    "@kubernetes/client-node": "^0.15.0",
+    "express": "^4.17.1",
+    "jq": "^1.7.2",
+    "jquery": "^3.6.0",
+    "mongoose": "^5.13.5"
+  }
+}
