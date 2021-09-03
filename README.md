@@ -34,3 +34,13 @@ Assuming that the software runs on a machine installed a Linux distribution such
 9. Request to the following URL on a browser
 
    $ http://localhost:3000
+
+references:
+using MongoDb v4.4
+setting default user/passwork for MongoDb
+https://stackoverflow.com/questions/38921414/mongodb-what-are-the-default-user-and-password
+https://www.digitalocean.com/community/tutorials/how-to-configure-remote-access-for-mongodb-on-ubuntu-20-04
+https://mongoosejs.com/docs/guide.html
+
+solving problems
+https://learn.coderslang.com/0021-nodejs-require-is-not-defined-error/
