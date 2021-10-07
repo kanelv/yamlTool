@@ -6,21 +6,21 @@
 		<link rel="stylesheet" href="styles.css">
     <!-- <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script> -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-		<script src=script.js></script>
+		<script src="script.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/vue"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/3.8.2/js-yaml.min.js"></script>
     <title>Management and Orchestration for Kubernetes YAML</title>
 </head>
 
-<body style="background-color: #3C5A96;">
+<body>
 	<div id="app">
 			<div class="col">
 			<div class="col-md-6 col-lg-6 col-sm-12">
 					<h3>Management and Orchestration for Kubernetes YAML</h3>
 					<div id="app">
 							<div class="form-group">
-									<label for="apiVersion" style="color:#FFFFFF">apiVersion</label>
+									<label for="apiVersion">apiVersion</label>
 									<select class="form-select form-select-lg mb-3" aria-label="Default select api version">
 											<option value="1">select apps/v1 apiVersion</option>
 											<option value="2">batch/v1beta1</option>
@@ -30,7 +30,7 @@
 							</div>
 
 							<div class="form-group">
-								<label for="kind" style="color:#FFFFFF">Resource Type</label>
+								<label for="kind">Resource Type</label>
 								<select class="form-select form-select-lg mb-3" aria-label="Default select kind" v-model="ResourceType">
 										<option value="1">Deployment</option>
 										<option value="2">StatefulSet</option>
@@ -39,7 +39,7 @@
 						</div>
 
 							<div class="form-group">
-									<label for="txtDockerImageName" style="color:#FFFFFF">Docker Image Name:</label>
+									<label for="txtDockerImageName">Docker Image Name:</label>
 									<input type="text" class="form-control" id="txtDockerImageName" name="txtDockerImageName" v-model="DockerImageName" />
 									<!-- Examples:
 									<pre>
