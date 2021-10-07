@@ -4,7 +4,9 @@
 <head>
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
 		<link rel="stylesheet" href="styles.css">
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script> -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src=script.js></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/vue"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/3.8.2/js-yaml.min.js"></script>
@@ -19,13 +21,23 @@
 					<div id="app">
 							<div class="form-group">
 									<label for="apiVersion" style="color:#FFFFFF">apiVersion</label>
-									<select class="form-select form-select-lg mb-3" aria-label="Default select example">
+									<select class="form-select form-select-lg mb-3" aria-label="Default select api version">
 											<option value="1">select apps/v1 apiVersion</option>
 											<option value="2">batch/v1beta1</option>
 											<option value="3">discovery.k8s.io/v1beta1</option>
 											<option value="4">events.k8s.io/v1beta1</option>
 									</select>
 							</div>
+
+							<div class="form-group">
+								<label for="kind" style="color:#FFFFFF">Resource Type</label>
+								<select class="form-select form-select-lg mb-3" aria-label="Default select kind" v-model="ResourceType">
+										<option value="1">Deployment</option>
+										<option value="2">StatefulSet</option>
+										<option value="3">DaemonSet</option>
+								</select>
+						</div>
+
 							<div class="form-group">
 									<label for="txtDockerImageName" style="color:#FFFFFF">Docker Image Name:</label>
 									<input type="text" class="form-control" id="txtDockerImageName" name="txtDockerImageName" v-model="DockerImageName" />
@@ -160,175 +172,177 @@
 		</div>
 			</div>
 	</div>
-
+	<p>Check Import script.js</p>
 	<script type="text/javascript">
-			var app = new Vue({
-					el: '#app',
-					data: {
-							DockerImageName: '',
-			ContainerCommand: '',
-			ContainerArgs: '',
-			DeploymentNameOverride: '',
-			ContainerNameOverride: '',
-			AppLabelOverride: '',
-			ServiceNameOverride: '',
-			Replicas: '3',
-			ServiceType: 'ClusterIP',
-			Ports: []
-					},
-					computed: {
-							DockerImageNameNoTag: function() {
-				var imageName = '';
-				imageName = this.DockerImageName;
-				
-				if (imageName.lastIndexOf('/') >= 0) {
-					imageName = imageName.substr(imageName.lastIndexOf('/')+1, imageName.length-1);
-				}
-				
-				if (imageName.indexOf(':') >= 0) {
-					imageName = imageName.substr(0, imageName.indexOf(':'));
-				}
-				
-									return imageName;
-							},
-			DeploymentName: function() {
-				if (this.DeploymentNameOverride.length > 0) {
-					return this.DeploymentNameOverride;
-				}
-				return this.DockerImageNameNoTag;
-			},
-			ContainerName: function() {
-				if (this.ContainerNameOverride.length > 0) {
-					return this.ContainerNameOverride;
-				}
-				return this.DockerImageNameNoTag;
-			},
-			AppLabel: function() {
-				if (this.AppLabelOverride.length > 0) {
-					return this.AppLabelOverride;
-				}
-				return this.DockerImageNameNoTag;
-			},
-			ServiceName: function() {
-				if (this.ServiceNameOverride.length > 0) {
-					return this.ServiceNameOverride;
-				}
-				
-				if (this.DeploymentName.length === 0) {
-					return "unnamed-service";
-				}
-				
-				return this.DeploymentName + "-service";
-			},
-			ServicePorts: function() {
-				var portsWithServices = this.Ports.filter(function( port ) {
-						return port.ExposeViaService === true;
-					});
-				return portsWithServices;
-			},
-			HasOneOrMoreServicePorts: function() {
-				return (this.ServicePorts.length > 0);
-			},
-			DeploymentYaml: function() {
-				var containerPorts = [];
-				for (var i = 0; i < this.Ports.length; i++) {
-					var portString = this.Ports[i].ContainerPort;
-					if ((portString%1)===0) {
-						containerPorts.push({
-							'containerPort': parseInt(portString)
-						});
-					}
-				}
-				var deploymentObj = {
-					'apiVersion': 'extensions/v1beta1',
-					'kind': 'Deployment',
-					'metadata': {
-						'name': this.DeploymentName
-					},
-					'spec': {
-						'replicas': parseInt(this.Replicas),
-						'template': {
-							'metadata': {
-								'labels': {
-									'app': this.AppLabel
-								} // end labels
-							}, // end metadata
-							'spec': {
-								'containers': [{
-									'name': this.ContainerName,
-									'image': this.DockerImageName,
-									'ports': containerPorts
-								}]
-							} // end spec
-						} // end template
-					} // end spec
-				} // end deploymentObj
-				
-				if (this.ContainerCommand.length > 0) {
-					deploymentObj.spec.template.spec.containers[0].command = [this.ContainerCommand];
-				}
-				
-				if (this.ContainerArgs.length > 0) {
-					deploymentObj.spec.template.spec.containers[0].args = [this.ContainerArgs];
-				}
-				
-				return jsyaml.dump(deploymentObj);
-			},
-			ServiceYaml: function() {
-				var ports = [];
-				for (var i = 0; i < this.ServicePorts.length; i++) {						
-					var port = this.ServicePorts[i];
-					var servicePortObj = {
-						'port': parseInt(port.ServicePort),
-						'targetPort': parseInt(port.ContainerPort),
-						'protocol': port.ServicePortProtocol
-					};
-					if (port.ServicePortName.length > 0) {
-						servicePortObj.name = port.ServicePortName;
-					}
-					ports.push(servicePortObj);
-				}
-				
-				var serviceObj = {
-					'apiVersion': 'v1',
-					'kind': 'Service',
-					'metadata': {
-						'name': this.ServiceName,
-						'labels': {
-							'name': this.ServiceName
-						} // end labels
-					},
-					'spec': {
-						'ports': ports,
-						'selector': {
-							'app': this.AppLabel
+		var app = new Vue({
+				el: '#app',
+				data: {
+						ResourceType: '',
+						DockerImageName: '',
+						ContainerCommand: '',
+						ContainerArgs: '',
+						DeploymentNameOverride: '',
+						ContainerNameOverride: '',
+						AppLabelOverride: '',
+						ServiceNameOverride: '',
+						Replicas: '3',
+						ServiceType: 'ClusterIP',
+						Ports: []
+				},
+				computed: {
+						DockerImageNameNoTag: function() {
+							var imageName = '';
+							imageName = this.DockerImageName;
+							
+							if (imageName.lastIndexOf('/') >= 0) {
+								imageName = imageName.substr(imageName.lastIndexOf('/')+1, imageName.length-1);
+							}
+							
+							if (imageName.indexOf(':') >= 0) {
+								imageName = imageName.substr(0, imageName.indexOf(':'));
+							}
+							
+							return imageName;
 						},
-						'type': this.ServiceType
-					} // end spec
-				} // end deploymentObj
-				return jsyaml.dump(serviceObj);
+
+						DeploymentName: function() {
+							if (this.DeploymentNameOverride.length > 0) {
+								return this.DeploymentNameOverride;
+							}
+							return this.DockerImageNameNoTag;
+						},
+						ContainerName: function() {
+							if (this.ContainerNameOverride.length > 0) {
+								return this.ContainerNameOverride;
+							}
+							return this.DockerImageNameNoTag;
+						},
+						AppLabel: function() {
+							if (this.AppLabelOverride.length > 0) {
+								return this.AppLabelOverride;
+							}
+							return this.DockerImageNameNoTag;
+						},
+						ServiceName: function() {
+							if (this.ServiceNameOverride.length > 0) {
+								return this.ServiceNameOverride;
+							}
+							
+							if (this.DeploymentName.length === 0) {
+								return "unnamed-service";
+							}
+							
+							return this.DeploymentName + "-service";
+						},
+						ServicePorts: function() {
+							var portsWithServices = this.Ports.filter(function( port ) {
+									return port.ExposeViaService === true;
+								});
+							return portsWithServices;
+						},
+						HasOneOrMoreServicePorts: function() {
+							return (this.ServicePorts.length > 0);
+						},
+						DeploymentYaml: function() {
+							var containerPorts = [];
+							for (var i = 0; i < this.Ports.length; i++) {
+								var portString = this.Ports[i].ContainerPort;
+								if ((portString%1)===0) {
+									containerPorts.push({
+										'containerPort': parseInt(portString)
+									});
+								}
+							}
+			var deploymentObj = {
+				'apiVersion': 'extensions/v1beta1',
+				'kind': 'Deployment',
+				'metadata': {
+					'name': this.DeploymentName
+				},
+				'spec': {
+					'replicas': parseInt(this.Replicas),
+					'template': {
+						'metadata': {
+							'labels': {
+								'app': this.AppLabel
+							} // end labels
+						}, // end metadata
+						'spec': {
+							'containers': [{
+								'name': this.ContainerName,
+								'image': this.DockerImageName,
+								'ports': containerPorts
+							}]
+						} // end spec
+					} // end template
+				} // end spec
+			} // end deploymentObj
+			
+			if (this.ContainerCommand.length > 0) {
+				deploymentObj.spec.template.spec.containers[0].command = [this.ContainerCommand];
 			}
-					},
-		methods: {
-			addPort: function() {
-				var newPort = {
-					ContainerPort: '80',
-					ExposeViaService: false,
-					ServicePortName: '',
-					ServicePort: '80',
-					ServicePortProtocol: 'TCP'
+			
+			if (this.ContainerArgs.length > 0) {
+				deploymentObj.spec.template.spec.containers[0].args = [this.ContainerArgs];
+			}
+			
+			return jsyaml.dump(deploymentObj);
+		},
+		ServiceYaml: function() {
+			var ports = [];
+			for (var i = 0; i < this.ServicePorts.length; i++) {						
+				var port = this.ServicePorts[i];
+				var servicePortObj = {
+					'port': parseInt(port.ServicePort),
+					'targetPort': parseInt(port.ContainerPort),
+					'protocol': port.ServicePortProtocol
 				};
-				
-				this.Ports.push(newPort);
-			},
-			deletePort: function(port) {
-				var portIndex = this.Ports.indexOf(port);
-				if (portIndex > -1) {
-					this.Ports.splice(portIndex, 1);
+				if (port.ServicePortName.length > 0) {
+					servicePortObj.name = port.ServicePortName;
 				}
+				ports.push(servicePortObj);
+			}
+			
+			var serviceObj = {
+				'apiVersion': 'v1',
+				'kind': 'Service',
+				'metadata': {
+					'name': this.ServiceName,
+					'labels': {
+						'name': this.ServiceName
+					} // end labels
+				},
+				'spec': {
+					'ports': ports,
+					'selector': {
+						'app': this.AppLabel
+					},
+					'type': this.ServiceType
+				} // end spec
+			} // end deploymentObj
+			return jsyaml.dump(serviceObj);
+		}
+				},
+	methods: {
+		addPort: function() {
+			var newPort = {
+				ContainerPort: '80',
+				ExposeViaService: false,
+				ServicePortName: '',
+				ServicePort: '80',
+				ServicePortProtocol: 'TCP'
+			};
+			
+			this.Ports.push(newPort);
+		},
+		deletePort: function(port) {
+			var portIndex = this.Ports.indexOf(port);
+			if (portIndex > -1) {
+				this.Ports.splice(portIndex, 1);
 			}
 		}
-			});
+	}
+		});
 	</script>
 </body>
 
