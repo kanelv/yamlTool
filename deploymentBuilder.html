@@ -3,6 +3,7 @@
 
 <head>
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="styles.css">
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/vue"></script>
@@ -14,10 +15,10 @@
 	<div id="app">
 			<div class="col">
 			<div class="col-md-6 col-lg-6 col-sm-12">
-					<h3 style="color:#FFFFFF">Management and Orchestration for Kubernetes YAML</h3>
+					<h3>Management and Orchestration for Kubernetes YAML</h3>
 					<div id="app">
 							<div class="form-group">
-									<label for="apiVersion">apiVersion</label>
+									<label for="apiVersion" style="color:#FFFFFF">apiVersion</label>
 									<select class="form-select form-select-lg mb-3" aria-label="Default select example">
 											<option value="1">select apps/v1 apiVersion</option>
 											<option value="2">batch/v1beta1</option>
@@ -26,15 +27,15 @@
 									</select>
 							</div>
 							<div class="form-group">
-									<label for="txtDockerImageName">Docker Image Name:</label>
+									<label for="txtDockerImageName" style="color:#FFFFFF">Docker Image Name:</label>
 									<input type="text" class="form-control" id="txtDockerImageName" name="txtDockerImageName" v-model="DockerImageName" />
-									Examples:
+									<!-- Examples:
 									<pre>
 										busybox
 										nginx
 										busybox:latest
-										gcr.io/your-project-id/your-namespace/your-image:latest
-									</pre>
+										gcr.io/your-project	-id/your-namespace/your-image:latest
+									</pre> -->
 							</div>
 				<div class="form-group">
 									<label for="txtContainerCommand">Container Command:</label>
