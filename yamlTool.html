@@ -22,7 +22,7 @@
 							<div class="form-group">
 									<label for="apiVersion">apiVersion</label>
 									<select class="form-select form-select-lg mb-3" aria-label="Default select api version">
-											<option value="1">select apps/v1 apiVersion</option>
+											<option value="1">apps/v1 apiVersion</option>
 											<option value="2">batch/v1beta1</option>
 											<option value="3">discovery.k8s.io/v1beta1</option>
 											<option value="4">events.k8s.io/v1beta1</option>
@@ -31,7 +31,7 @@
 
 							<div class="form-group">
 								<label for="kind">Resource Type</label>
-								<select class="form-select form-select-lg mb-3" aria-label="Default select kind" v-model="ResourceType">
+								<select class="form-select form-select-lg mb-3" aria-label="Default select resource type" v-model="ResourceType">
 										<option value="1">Deployment</option>
 										<option value="2">StatefulSet</option>
 										<option value="3">DaemonSet</option>
@@ -40,7 +40,7 @@
 
 							<div class="form-group">
 									<label for="txtDockerImageName">Docker Image Name:</label>
-									<input type="text" class="form-control" id="txtDockerImageName" name="txtDockerImageName" v-model="DockerImageName" />
+									<input type="text" class="form-control" id="txtDockerImageName" name="txtDockerImageName" placeholder="busybox:latest, nginx:1.1.4" v-model="DockerImageName" />
 									<!-- Examples:
 									<pre>
 										busybox
@@ -172,7 +172,7 @@
 		</div>
 			</div>
 	</div>
-	<p>Check Import script.js</p>
+	<!-- <p>Check Import script.js</p> -->
 	<script type="text/javascript">
 		var app = new Vue({
 			el: '#app',
@@ -243,6 +243,8 @@
 				HasOneOrMoreServicePorts: function() {
 					return (this.ServicePorts.length > 0);
 				},
+
+				// function for real-time render DeploymentYaml
 				DeploymentYaml: function() {
 					var containerPorts = [];
 					for (var i = 0; i < this.Ports.length; i++) {
@@ -288,6 +290,8 @@
 					
 					return jsyaml.dump(deploymentObj);
 				},
+
+				// it should be the function for real-time render ServiceYaml
 				ServiceYaml: function() {
 					var ports = [];
 					for (var i = 0; i < this.ServicePorts.length; i++) {						
