@@ -4,8 +4,8 @@
   "description": "for generating and managing yaml file",
   "main": "yamlTool.js",
   "scripts": {
-    "test": "node yamlTool.js",
-    "start": "node yamlTool.js"
+    "test": "node app.js",
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
     "express": "^4.17.1",
     "jq": "^1.7.2",
     "jquery": "^3.6.0",
+    "js-yaml": "^4.1.0",
     "mongoose": "^5.13.7"
   }
 }
