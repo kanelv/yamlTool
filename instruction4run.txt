@@ -31,3 +31,7 @@ $ yarn start
 
 9. Request to the following URL on a browser: 
 $ http://localhost:3000
+
+10. Put some config to get realtime generate yaml result
+
+11. Click the button to download an yaml file for the deployment
