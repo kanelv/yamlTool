@@ -9,7 +9,7 @@
 		<script src="script.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://unpkg.com/vue"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/3.8.2/js-yaml.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <title>Management and Orchestration for Kubernetes YAML</title>
 </head>
 
@@ -159,12 +159,12 @@
 		<div class="col">
 			<div class="col-md-6 col-lg-6 col-sm-12">
 				<h4>Generated YAML</h4>
-				<pre>
-					{{DeploymentYaml}}
-					<template v-if="HasOneOrMoreServicePorts">---
-						{{ServiceYaml}}
-					</template>
-				</pre>
+<pre>
+{{DeploymentYaml}}
+<template v-if="HasOneOrMoreServicePorts">---
+	{{ServiceYaml}}
+</template>
+</pre>
 			</div>
 		</div>
 	</div>
@@ -283,7 +283,9 @@
 					if (this.ContainerArgs.length > 0) {
 						deploymentObj.spec.template.spec.containers[0].args = [this.ContainerArgs];
 					}
-					
+					// console.log("Show the js of deploymentObj");
+					// console.log(deploymentObj);
+					// result = jsyaml.dump(deploymentObj);
 					return jsyaml.dump(deploymentObj);
 				},
 
