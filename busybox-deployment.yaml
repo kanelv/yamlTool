@@ -14,9 +14,11 @@ spec:
     spec:
       containers:
         - name: busybox
-          image: busybox:1.34.0
+          image: busybox:1.34.0-uclibc
           ports:
             - containerPort: 80
+          command:
+            - '["/bin/sh"]'
 
 ---
 apiVersion: v1
@@ -26,10 +28,7 @@ metadata:
   labels:
     name: busybox-service
 spec:
-  ports:
-    - port: 80
-      targetPort: 80
-      protocol: TCP
+  ports: []
   selector:
     app: busybox
   type: ClusterIP
