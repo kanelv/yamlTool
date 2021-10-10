@@ -22,10 +22,10 @@
 						<div class="form-group">
 							<label for="apiVersion">apiVersion</label>
 							<select class="form-select form-select-lg mb-3" aria-label="Default select api version">
-								<option value="1">apps/v1 apiVersion</option>
-								<option value="2">batch/v1beta1</option>
+								<option value="1">apps/v1</option>
+								<!-- <option value="2">batch/v1beta1</option>
 								<option value="3">discovery.k8s.io/v1beta1</option>
-								<option value="4">events.k8s.io/v1beta1</option>
+								<option value="4">events.k8s.io/v1beta1</option> -->
 							</select>
 						</div>
 
@@ -71,10 +71,10 @@
 						</div>
 						<div class="form-group">
 							<label for="txtReplicas">Replicas:</label>
-							<input type="text" class="form-control" id="txtReplicas" name="txtReplicas" v-model="Replicas" />
+							<input type="text" class="form-control" id="txtReplicas" name="txtReplicas" v-model="ReplicasOverride" />
 						</div>
 
-						<div class="panel panel-default">
+						<div class="panel panel-primary">
 							<div class="panel-heading">
 								<h4>Ports</h4>
 							</div>
@@ -88,7 +88,7 @@
 											<div class="row">
 												<div class="col-lg-6 col-sm-6 col-md-6">
 													<div class="input-group">
-														<span class="input-group-addon" style=" padding:0 15px;"><button v-on:click="deletePort(port)"><span class="glyphicon glyphicon-trash"></span></button> Container Port</span>
+														<span class="input-group-addon" style=" padding:0 15px;"><button class="btn btn-danger" v-on:click="deletePort(port)"><span class="glyphicon glyphicon-trash"></span></button> Container Port</span>
 														<input type="text" class="form-control" v-model="port.ContainerPort" />
 													</div>
 												</div>
@@ -165,6 +165,9 @@
 	{{ServiceYaml}}
 </template>
 </pre>
+				<div>
+					<button class="btn btn-primary" v-on:click="generateYAMLfile"><span class="glyphicon glyphicon-download"></span> Download</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -173,7 +176,8 @@
 		var app = new Vue({
 			el: '#app',
 			data: {
-					ResourceType: '',
+					ApiVersion: '1',
+					ResourceType: '1',
 					DockerImageName: '',
 					ContainerCommand: '',
 					ContainerArgs: '',
@@ -181,11 +185,24 @@
 					ContainerNameOverride: '',
 					AppLabelOverride: '',
 					ServiceNameOverride: '',
-					Replicas: '3',
+					ReplicasOverride: '3',
 					ServiceType: 'ClusterIP',
 					Ports: []
 			},
 			computed: {
+				ResourceTypeConvert: function() {
+					if(this.ResourceType == 1) {
+						return 'Deployment';
+					}
+					if(this.ResourceType == 2) {
+						return 'StatefulSet';
+					}
+					if(this.ResourceType == 3) {
+						return 'DaemonSet';
+					}
+				},
+
+				// Setting DockerImage
 				DockerImageNameNoTag: function() {
 					var imageName = '';
 					imageName = this.DockerImageName;
@@ -201,24 +218,40 @@
 					return imageName;
 				},
 
+				// If it is not set DeploymentName, it will be set as DockerImageNameNoTag
 				DeploymentName: function() {
 					if (this.DeploymentNameOverride.length > 0) {
 						return this.DeploymentNameOverride;
 					}
 					return this.DockerImageNameNoTag;
 				},
+
+				// If it is not set ContainerName, it will be set as DockerImageNameNoTag
 				ContainerName: function() {
 					if (this.ContainerNameOverride.length > 0) {
 						return this.ContainerNameOverride;
 					}
 					return this.DockerImageNameNoTag;
 				},
+
+				// If it is not set AppLabel, it will be set as DockerImageNameNoTag
 				AppLabel: function() {
 					if (this.AppLabelOverride.length > 0) {
 						return this.AppLabelOverride;
 					}
 					return this.DockerImageNameNoTag;
 				},
+				
+				// force the Replicas and ReplicasOverride are always greater than 0
+				Replicas: function() {
+					if (this.ReplicasOverride.trim().length > 0 && !isNaN(this.ReplicasOverride.trim())) {
+						return this.ReplicasOverride.trim();
+					}
+					this.ReplicasOverride = 1;
+					return 1;
+				},
+
+				// If it is not set AppLabel, it will be set as DockerImage-service
 				ServiceName: function() {
 					if (this.ServiceNameOverride.length > 0) {
 						return this.ServiceNameOverride;
@@ -230,6 +263,7 @@
 					
 					return this.DeploymentName + "-service";
 				},
+				
 				ServicePorts: function() {
 					var portsWithServices = this.Ports.filter(function( port ) {
 							return port.ExposeViaService === true;
@@ -252,8 +286,8 @@
 						}
 					}
 					var deploymentObj = {
-						'apiVersion': 'extensions/v1beta1',
-						'kind': 'Deployment',
+						'apiVersion': 'apps/v1',
+						'kind': this.ResourceTypeConvert,
 						'metadata': {
 							'name': this.DeploymentName
 						},
@@ -283,9 +317,7 @@
 					if (this.ContainerArgs.length > 0) {
 						deploymentObj.spec.template.spec.containers[0].args = [this.ContainerArgs];
 					}
-					// console.log("Show the js of deploymentObj");
-					// console.log(deploymentObj);
-					// result = jsyaml.dump(deploymentObj);
+
 					return jsyaml.dump(deploymentObj);
 				},
 
@@ -342,10 +374,31 @@
 					if (portIndex > -1) {
 						this.Ports.splice(portIndex, 1);
 					}
-				}
+				},
+
+				generateYAMLfile: function() {
+					// declare and assign filename and content of the YAML file
+					var filename = 'default-deployment.yaml';
+					if (this.DeploymentName && this.DeploymentName !== ''){
+						filename = this.DeploymentName + '-deployment.yaml';
+					}
+					
+					var content = this.DeploymentYaml;
+
+					// code for download YAML files
+					var element = document.createElement('a');
+        	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+        	element.setAttribute('download', filename);
+
+        	element.style.display = 'none';
+        	document.body.appendChild(element);
+
+        	element.click();
+
+        	document.body.removeChild(element);
+				},
 			}
 		});
 	</script>
 </body>
-
 </html>

@@ -3,7 +3,7 @@ const app = express();
 const path = require('path');
 const router = express.Router();
 
-app.use(express.static('public'))
+app.use(express.static('public'));
 
 router.get('/', function (req, res) {
     res.sendFile(path.join(__dirname + '/yamlTool.html'));
