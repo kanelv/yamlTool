@@ -4,7 +4,7 @@ metadata:
   name: haproxy
 spec:
   updateStrategy:
-    type: RollingUpdate
+    type: OnDelete
   template:
     metadata:
       labels:
@@ -12,9 +12,10 @@ spec:
     spec:
       containers:
         - name: haproxy
-          image: haproxy:2.4.7
+          image: haproxy:2.2.17-alpine
           ports:
             - containerPort: 80
+            - containerPort: 81
 
 ---
 apiVersion: v1
@@ -25,8 +26,11 @@ metadata:
     name: haproxy-service
 spec:
   ports:
-    - port: 80
+    - port: 8080
       targetPort: 80
+      protocol: TCP
+    - port: 8181
+      targetPort: 81
       protocol: TCP
   selector:
     app: haproxy
