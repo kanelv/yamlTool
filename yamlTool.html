@@ -43,7 +43,7 @@
 						<div class="form-group" v-if="PodManagementPolicySeen">
 							<label for="kind">Pod Management Policy</label>
 							<select class="form-select form-select-lg mb-3" aria-label="Default select Pod Management Policy" v-model="PodManagementPolicySelect">
-								<option value="1" v-if="RecreateSeen">OrderedReady</option>
+								<option value="1">OrderedReady</option>
 								<option value="2">Parallel</option>
 							</select>
 						</div>
@@ -353,7 +353,7 @@
 					}
 
 					// for StatefulSet Object
-					if(this.ResourceTypeSelect == 3) {
+					if(this.ResourceTypeSelect == 2) {
 						var statefulSetObj = {
 							'apiVersion': 'apps/v1',
 							'kind': this.ResourceType,
