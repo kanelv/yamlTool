@@ -187,7 +187,7 @@
 					RecreateSeen: true,
 					OnDeleteSeen: false,
 					PodManagementPolicySeen: false,
-					DeploymentStrategySelect: '2',
+					DeploymentStrategySelect: '1',
 					PodManagementPolicySelect: '1',
 					DockerImageName: '',
 					ContainerCommand: '',
@@ -211,6 +211,7 @@
 						this.RecreateSeen = false;
 						this.OnDeleteSeen = true;
 						this.PodManagementPolicySeen = true;
+						this.DeploymentStrategySelect = 2;
 						console.log('StatefulSet');
 						console.log('DeploymentActive', this.DeploymentActive);
 						console.log('StatefulSetActive', this.StatefulSetActive);
@@ -227,6 +228,7 @@
 						this.RecreateSeen = false;
 						this.OnDeleteSeen = true;
 						this.PodManagementPolicySeen = false;
+						this.DeploymentStrategySelect = 2;
 						console.log('DaemonSet');
 						console.log('DeploymentActive', this.DeploymentActive);
 						console.log('StatefulSetActive', this.StatefulSetActive);
@@ -242,6 +244,7 @@
 					this.RecreateSeen = true;
 					this.OnDeleteSeen = false;
 					this.PodManagementPolicySeen = false;
+					this.DeploymentStrategySelect = 1;
 					console.log('Deployment');
 					console.log('DeploymentActive', this.DeploymentActive);
 					console.log('StatefulSetActive', this.StatefulSetActive);
