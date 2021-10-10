@@ -22,10 +22,19 @@
 						<!-- Resource type -->
 						<div class="form-group">
 							<label for="kind">Resource Type</label>
-							<select class="form-select form-select-lg mb-3" aria-label="Default select resource type" v-model="ResourceType">
+							<select class="form-select form-select-lg mb-3" aria-label="Default select resource type" v-model="ResourceTypeSelect">
 								<option value="1">Deployment</option>
 								<option value="2">StatefulSet</option>
 								<option value="3">DaemonSet</option>
+							</select>
+						</div>
+
+						<!-- Deployment strategy -->
+						<div class="form-group">
+							<label for="kind">Deployment Strategy</label>
+							<select class="form-select form-select-lg mb-3" aria-label="Default select Deployment Strategy" v-model="DeploymentStrategySelect">
+								<option value="1">Recreate</option>
+								<option value="2">RollingUpdate</option>
 							</select>
 						</div>
 
@@ -160,7 +169,8 @@
 		var app = new Vue({
 			el: '#app',
 			data: {
-					ResourceType: '1',
+					ResourceTypeSelect: '1',
+					DeploymentStrategySelect: '1',
 					DockerImageName: '',
 					ContainerCommand: '',
 					ContainerArgs: '',
@@ -173,16 +183,23 @@
 					Ports: []
 			},
 			computed: {
-				ResourceTypeConvert: function() {
-					if(this.ResourceType == 1) {
+				ResourceType: function() {
+					if(this.ResourceTypeSelect == 1) {
 						return 'Deployment';
 					}
-					if(this.ResourceType == 2) {
+					if(this.ResourceTypeSelect == 2) {
 						return 'StatefulSet';
 					}
-					if(this.ResourceType == 3) {
-						return 'DaemonSet';
+					
+					return 'DaemonSet';
+				},
+
+				DeploymentStrategy: function() {
+					if(this.DeploymentStrategySelect == 1) {
+						return 'Recreate';
 					}
+
+					return 'RollingUpdate';
 				},
 
 				// Setting DockerImage
@@ -270,12 +287,15 @@
 					}
 					var deploymentObj = {
 						'apiVersion': 'apps/v1',
-						'kind': this.ResourceTypeConvert,
+						'kind': this.ResourceType,
 						'metadata': {
 							'name': this.DeploymentName
 						},
 						'spec': {
 							'replicas': parseInt(this.Replicas),
+							'strategy': {
+								'type': this.DeploymentStrategy
+							},
 							'template': {
 								'metadata': {
 									'labels': {
