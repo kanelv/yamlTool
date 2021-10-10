@@ -153,7 +153,7 @@
 			<div class="col-md-6 col-lg-6 col-sm-12">
 				<h4>Generated YAML</h4>
 <pre>
-{{DeploymentYaml}}
+{{RenderYaml}}
 <template v-if="HasOneOrMoreServicePorts">---
 	{{ServiceYaml}}
 </template>
@@ -274,8 +274,8 @@
 					return (this.ServicePorts.length > 0);
 				},
 
-				// function for real-time render DeploymentYaml
-				DeploymentYaml: function() {
+				// function for render Yaml
+				RenderYaml: function() {
 					var containerPorts = [];
 					for (var i = 0; i < this.Ports.length; i++) {
 						var portString = this.Ports[i].ContainerPort;
@@ -285,6 +285,48 @@
 							});
 						}
 					}
+
+					// for DaemonSet Object
+					if(ResourceTypeSelect == 3) {
+						var daemonSetObj = {
+							'apiVersion': 'apps/v1',
+							'kind': this.ResourceType,
+							'metadata': {
+								'name': this.DeploymentName
+							},
+							'spec': {
+								'updateStrategy': {
+									'type': this.DeploymentStrategy
+								},
+								'template': {
+									'metadata': {
+										'labels': {
+											'app': this.AppLabel
+										} // end labels
+									}, // end metadata
+									'spec': {
+										'containers': [{
+											'name': this.ContainerName,
+											'image': this.DockerImageName,
+											'ports': containerPorts
+										}]
+									} // end spec
+								} // end template
+							} // end spec
+						} // end daemonSetObj
+
+						if (this.ContainerCommand.length > 0) {
+							daemonSetObj.spec.template.spec.containers[0].command = [this.ContainerCommand];
+						}
+						
+						if (this.ContainerArgs.length > 0) {
+							daemonSetObj.spec.template.spec.containers[0].args = [this.ContainerArgs];
+						}
+
+						return jsyaml.dump(daemonSetObj);
+					}
+
+					// for Deployment Object
 					var deploymentObj = {
 						'apiVersion': 'apps/v1',
 						'kind': this.ResourceType,
@@ -386,7 +428,7 @@
 						filename = this.DeploymentName + '-deployment.yaml';
 					}
 					
-					var content = this.DeploymentYaml;
+					var content = this.RenderYaml;
 
 					// code for download YAML files
 					var element = document.createElement('a');
