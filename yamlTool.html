@@ -33,8 +33,9 @@
 						<div class="form-group">
 							<label for="kind">Deployment Strategy</label>
 							<select class="form-select form-select-lg mb-3" aria-label="Default select Deployment Strategy" v-model="DeploymentStrategySelect">
-								<option value="1">Recreate</option>
+								<option value="1" v-if="RecreateSeen">Recreate</option>
 								<option value="2">RollingUpdate</option>
+								<option value="3" v-if="OnDeleteSeen">OnDelete</option>
 							</select>
 						</div>
 
@@ -62,7 +63,7 @@
 							<label for="txtAppLabelOverride">App Label:</label>
 							<input type="text" class="form-control" id="txtAppLabelOverride" name="txtAppLabelOverride" v-bind:placeholder="AppLabel" v-model="AppLabelOverride" />
 						</div>
-						<div class="form-group">
+						<div class="form-group" v-if="ReplicasSeen">
 							<label for="txtReplicas">Replicas:</label>
 							<input type="text" class="form-control" id="txtReplicas" name="txtReplicas" v-model="ReplicasOverride" />
 						</div>
@@ -170,7 +171,13 @@
 			el: '#app',
 			data: {
 					ResourceTypeSelect: '1',
-					DeploymentStrategySelect: '1',
+					DeploymentActive: true,
+					StatefulSetActive: false,
+					DaemonSetActive: false,
+					ReplicasSeen: true,
+					RecreateSeen: true,
+					OnDeleteSeen: false,
+					DeploymentStrategySelect: '2',
 					DockerImageName: '',
 					ContainerCommand: '',
 					ContainerArgs: '',
@@ -184,19 +191,56 @@
 			},
 			computed: {
 				ResourceType: function() {
-					if(this.ResourceTypeSelect == 1) {
-						return 'Deployment';
-					}
 					if(this.ResourceTypeSelect == 2) {
+						// for StatefulSet member seen
+						this.DeploymentActive = false;
+						this.StatefulSetActive = true;
+						this.DaemonSetActive = false;
+						this.ReplicasSeen = true;
+						this.RecreateSeen = false;
+						this.OnDeleteSeen = true;
+						console.log('StatefulSet');
+						console.log('DeploymentActive', this.DeploymentActive);
+						console.log('StatefulSetActive', this.StatefulSetActive);
+						console.log('DaemonSetActive', this.DaemonSetActive);
 						return 'StatefulSet';
 					}
-					
-					return 'DaemonSet';
+
+					if(this.ResourceTypeSelect == 3) {
+						// for DaemonSet member seen
+						this.DeploymentActive = false;
+						this.StatefulSetActive = false;
+						this.DaemonSetActive = true;
+						this.ReplicasSeen = false;
+						this.RecreateSeen = false;
+						this.OnDeleteSeen = true;
+						console.log('DaemonSet');
+						console.log('DeploymentActive', this.DeploymentActive);
+						console.log('StatefulSetActive', this.StatefulSetActive);
+						console.log('DaemonSetActive', this.DaemonSetActive);
+						return 'DaemonSet';
+					}
+
+					// for Deployment member seen
+					this.DeploymentActive = true;
+					this.StatefulSetActive = false;
+					this.DaemonSetActive = false;
+					this.ReplicasSeen = true;
+					this.RecreateSeen = true;
+					this.OnDeleteSeen = false;
+					console.log('Deployment');
+					console.log('DeploymentActive', this.DeploymentActive);
+					console.log('StatefulSetActive', this.StatefulSetActive);
+					console.log('DaemonSetActive', this.DaemonSetActive);
+					return 'Deployment';
 				},
 
 				DeploymentStrategy: function() {
 					if(this.DeploymentStrategySelect == 1) {
 						return 'Recreate';
+					}
+					if(this.DeploymentStrategySelect == 3) {
+						return 'OnDelete';
 					}
 
 					return 'RollingUpdate';
@@ -273,7 +317,7 @@
 				HasOneOrMoreServicePorts: function() {
 					return (this.ServicePorts.length > 0);
 				},
-
+				
 				// function for render Yaml
 				RenderYaml: function() {
 					var containerPorts = [];
@@ -287,7 +331,7 @@
 					}
 
 					// for DaemonSet Object
-					if(ResourceTypeSelect == 3) {
+					if(this.ResourceTypeSelect == 3) {
 						var daemonSetObj = {
 							'apiVersion': 'apps/v1',
 							'kind': this.ResourceType,
@@ -354,7 +398,7 @@
 							} // end template
 						} // end spec
 					} // end deploymentObj
-			
+
 					if (this.ContainerCommand.length > 0) {
 						deploymentObj.spec.template.spec.containers[0].command = [this.ContainerCommand];
 					}
