@@ -19,16 +19,7 @@
 			<div class="col-md-6 col-lg-6 col-sm-12">
 				<h3>Management and Orchestration for Kubernetes YAML</h3>
 					<div id="app">
-						<div class="form-group">
-							<label for="apiVersion">apiVersion</label>
-							<select class="form-select form-select-lg mb-3" aria-label="Default select api version">
-								<option value="1">apps/v1</option>
-								<!-- <option value="2">batch/v1beta1</option>
-								<option value="3">discovery.k8s.io/v1beta1</option>
-								<option value="4">events.k8s.io/v1beta1</option> -->
-							</select>
-						</div>
-
+						<!-- Resource type -->
 						<div class="form-group">
 							<label for="kind">Resource Type</label>
 							<select class="form-select form-select-lg mb-3" aria-label="Default select resource type" v-model="ResourceType">
@@ -41,13 +32,6 @@
 						<div class="form-group">
 							<label for="txtDockerImageName">Docker Image Name:</label>
 							<input type="text" class="form-control" id="txtDockerImageName" name="txtDockerImageName" placeholder="busybox:latest, nginx:1.1.4" v-model="DockerImageName" />
-							<!-- Examples:
-							<pre>
-								busybox
-								nginx
-								busybox:latest
-								gcr.io/your-project	-id/your-namespace/your-image:latest
-							</pre> -->
 						</div>
 						<div class="form-group">
 							<label for="txtContainerCommand">Container Command:</label>
@@ -176,7 +160,6 @@
 		var app = new Vue({
 			el: '#app',
 			data: {
-					ApiVersion: '1',
 					ResourceType: '1',
 					DockerImageName: '',
 					ContainerCommand: '',
