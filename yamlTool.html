@@ -165,7 +165,7 @@
 <pre>
 {{RenderYaml}}
 <template v-if="HasOneOrMoreServicePorts">---
-	{{ServiceYaml}}
+{{ServiceYaml}}
 </template>
 </pre>
 				<div>
@@ -536,7 +536,7 @@
 						filename = this.DeploymentName + '-deployment.yaml';
 					}
 					
-					var content = this.RenderYaml;
+					var content = this.RenderYaml + '\n---\n' + this.ServiceYaml;
 
 					// code for download YAML files
 					var element = document.createElement('a');
