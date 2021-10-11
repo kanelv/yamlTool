@@ -55,7 +55,7 @@
 
 10. Click the button to download an yaml file for the deployment
 ---
-### I attached some results in the results folder.
+### I attached some results in the results folder. You can refer to it for the demos.
 
 ### References:
 https://learn.coderslang.com/0021-nodejs-require-is-not-defined-error/
