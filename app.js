@@ -15,3 +15,5 @@ app.use('/', router);
 app.listen(process.env.port || 3000);
 
 console.log('Running at Port 3000');
+console.log('Open the following link on a Browser: ');
+console.log('http://localhost:3000');
