@@ -1,4 +1,4 @@
-Assuming that the software runs on a machine installed a Linux distribution such as Ubuntu, CentOs.
+Assuming that the software runs on a machine installed a Linux distribution such as Ubuntu.
 
 1. Install Node.js v14.x that is JavaScript runtime environment
 $ curl -sL https://deb.nodesource.com/setup_14.x -o nodesource_setup.sh
@@ -31,3 +31,8 @@ $ http://localhost:3000
 9. Put some config to get realtime generate yaml result
 
 10. Click the button to download an yaml file for the deployment
+
+I attached some results in the results folder.
+
+references:
+https://learn.coderslang.com/0021-nodejs-require-is-not-defined-error/
